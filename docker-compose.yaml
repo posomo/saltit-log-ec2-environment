@@ -1,0 +1,37 @@
+version: '3.7'
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - 6379:6379
+    # 스토리지 마운트(볼륨) 설정
+    volumes:
+      - ~/datas/redis/:/data
+      - ./redis/conf/redis.conf:/usr/local/conf/redis.conf
+    restart: always
+    command: redis-server /usr/local/conf/redis.conf
+    container_name: redis_container
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.6.2
+    volumes:
+      - ./logstash/config/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    container_name: logstash_container
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.7.1
+    volumes:
+      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ~/datas/elasticsearch:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    container_name: elasticsearch_container
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.7.1
+    volumes:
+      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+    - "5601:5601"
+    container_name: kibana_container
